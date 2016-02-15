@@ -1,3 +1,4 @@
+<h1>USER DETAILS</h1>
 <table border=1>
 <tr><th>Username</th>
 <th>First Name</th>
@@ -5,13 +6,15 @@
 <th>Address1</th>
 <th>Address2</th>
 </tr>
-<% userinfo.forEach(function (users) { %>
+<% userinfo.Count_user.forEach(function (users) { %>
 <tr>
 <td><%= users.username %></td>
 <td><%= users.fname %></td>
 <td><%= users.lname %></td>
-<td><%= users.address1 %></td>
-<td><%= users.address2 %></td>
+<% userinfo.Count_user2.forEach(function (useradd) { %>
+<td><%= useradd.address1 %></td>
+<td><%= useradd.address2 %></td>
+<% }); %>
 </tr>
 <% }); %>
 </table>

@@ -36,7 +36,11 @@ module.exports.routes = {
   //   view: 'homepage'
   // }
 
-  'get /UserloginController/afterlogin_authenticate': 'UserloginController.afterlogin_authenticate'
+  'get /UserloginController/afterlogin_authenticate': 'UserloginController.afterlogin_authenticate',
+  'post /UserloginController/register_user': 'UserloginController.register_user',
+  'get /views/register': { view: 'register' },
+  'get /UserloginController/afterlogin_viewprofile': 'UserloginController.afterlogin_viewprofile' 
+  
 
   /***************************************************************************
   *                                                                          *
