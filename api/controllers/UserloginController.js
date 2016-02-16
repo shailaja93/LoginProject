@@ -4,11 +4,12 @@
  * @description :: Server-side logic for managing Userlogins
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
+var bcrypt = require('bcryptjs');
 
 module.exports = {
 
   afterlogin_viewprofile: function(req,res) {
- 
+         
         var userid = req.session.userid;
         Userinfo.find({id : userid }, {select: ['username','password','id','fname','lname']})
         .exec(function(err, user1) {
@@ -39,29 +40,9 @@ module.exports = {
         var uname = param.username;
         console.log(pass);
         console.log(uname);
-        req.session.username = '';
-        req.session.password = '';
+        
 
-        if(req.session.username != '' && req.session.password != '')
-        {
-        Userinfo.find({username: uname, password : pass }, {select: ['username','id']})
-        .exec(function(err, user1) {
-        if(err) {
-           return res.send(err);
-        }
-        console.log("----------Session is not expired-------------");
-        console.log(user1);
-        console.log("-------------------------------------------");
-
-        var data = {
-                  Count_user : user1
-        };
-        res.view('welcome',{'user' : data.Count_user});
-        });  
-        }
-        else
-        {
-        Userinfo.find({username: uname, password : pass }, {select: ['username','id']})
+        Userinfo.find({username: uname}, {select: ['username','id','password']})
         .exec(function(err, user1) {
         if(err) {
            return res.send(err);
@@ -73,7 +54,7 @@ module.exports = {
         var data = {
                   Count_user : user1
         };
-        
+
         var len = data.Count_user.length;
         if(len == 1) 
         {
@@ -87,25 +68,31 @@ module.exports = {
           return -1;
           }
           var uid = getValueByKey('id', data.Count_user);
+          var p = getValueByKey('password', data.Count_user);
 
           req.session.userid = uid;
           req.session.username = uname;
-          req.session.password = pass;
-          console.log("----------After getting ID----------");
-          console.log(req.session);
-          console.log("------------------------------------");
-          res.view('welcome',{'user' : data.Count_user});
+          
+          bcrypt.compare(pass, p, function(err, valid) {
+                if(err || !valid)
+                    return res.send('Invalid username and password combination!', 500)
+                else
+                  res.view('welcome',{'user' : data.Count_user});
+          });
+          // console.log("----------After getting ID----------");
+          // console.log(req.session);
+          // console.log("------------------------------------");
+        //  res.view('welcome',{'user' : data.Count_user});
         }
         else
         {
            return res.send("Please enter a valid email/password!");
         }  
-      });
-      }  
+        });   
   },     
 
-  register_user : function(req,res)
-  {
+  register_user: function(req,res){
+
         var param = req.allParams();           
         var pass = param.password;
         var uname = param.username;
@@ -113,15 +100,16 @@ module.exports = {
         var lnm = param.lname;
         var add1 = param.address1;
         var add2 = param.address2;
+        //var password = "";
+ 
+       bcrypt.hash(pass, 10, function(err, hash) {
+       if(err) return cb(err);
+       pass = hash
+      // console.log(bcrypt.getSalt(hash));
+      // console.log(pass);
+       //});
 
-        // console.log(pass);
-        // console.log(uname);
-        // console.log(fnm);
-        // console.log(lnm);
-        // console.log(add1);
-        // console.log(add2);
-        
-
+       console.log(pass);
        Userinfo.find({username: uname}, {select: ['username']})      //find() to check if username exists or not
        .exec(function(err, user) {
        if(err) {
@@ -138,6 +126,7 @@ module.exports = {
        }
        else
        {
+
           Userinfo.create({                                // if name is unique,enter the records into the database
                           username: uname,
                           password : pass,
@@ -187,6 +176,7 @@ module.exports = {
                       });
        }        
        });    
+});
   }
 };
 

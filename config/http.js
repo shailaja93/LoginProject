@@ -21,7 +21,9 @@ module.exports.http = {
   *                                                                           *
   ****************************************************************************/
 
-  // middleware: {
+   middleware: {
+
+    custom : true ,
 
   /***************************************************************************
   *                                                                          *
@@ -54,10 +56,22 @@ module.exports.http = {
   *                                                                           *
   ****************************************************************************/
 
-    // myRequestLogger: function (req, res, next) {
-    //     console.log("Requested :: ", req.method, req.url);
-    //     return next();
-    // }
+    myRequestLogger: function (req, res, next) {
+          console.log("------------MIDDLEWARE----------");
+
+            if(req.session.username != '')
+            {
+              return next();
+            }
+            else
+            {
+                console.log("++++++++");
+                res.send(req.session.username);
+            }
+              
+       // console.log("Requested :: ", req.method, req.url);
+        //return next();
+    }
 
 
   /***************************************************************************
@@ -72,7 +86,7 @@ module.exports.http = {
     // bodyParser: require('skipper')
 
   // },
-
+}
   /***************************************************************************
   *                                                                          *
   * The number of seconds to cache flat files on disk being served by        *
