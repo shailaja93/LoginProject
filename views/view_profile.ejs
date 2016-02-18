@@ -1,20 +1,66 @@
-<h1>USER DETAILS</h1>
-<table border=1>
-<tr><th>Username</th>
-<th>First Name</th>
-<th>Last Name</th>
-<th>Address1</th>
-<th>Address2</th>
-</tr>
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover:not(.active) {
+    background-color: #111;
+}
+
+.active {
+    background-color: #4CAF50;
+}
+</style>
+</head>
+<body>
+
+<ul>
+  <li><a href="/views/welcome">Home</a></li>
+  <li><a href="/UserloginController/afterlogin_viewprofile">Profile</a></li>
+  <li><a href="/views/reset">Reset Password</a></li>
+  <ul style="float:right;list-style-type:none;">
+    <li><a class="active" href="/UserloginController/destroy_session">Logout</a></li>
+  </ul>
+</ul>
+<p>
+
+<form method="post" action='/UserloginController/afterlogin_updation'> 
 <% userinfo.Count_user.forEach(function (users) { %>
-<tr>
-<td><%= users.username %></td>
-<td><%= users.fname %></td>
-<td><%= users.lname %></td>
+<h4 style="font-family:verdana;">Hello,<label>&nbsp;&nbsp;<%= users.username %></label></h4>
+FIRST NAME:&nbsp;</b><input type="text" name="Fname" value=<%= users.fname %> required="required" /><br>
+LAST NAME:&nbsp;&nbsp;</b><input type="text" name="Lname" value=<%= users.lname %> /><br>
 <% userinfo.Count_user2.forEach(function (useradd) { %>
-<td><%= useradd.address1 %></td>
-<td><%= useradd.address2 %></td>
+ADDRESS1:&nbsp;&nbsp;&nbsp;</b><input type="text" name="Add1" value=<%= useradd.address1 %> required="required" /><br>
+ADDRESS2:&nbsp;&nbsp;&nbsp;</b><input type="text" name="Add2" value=<%= useradd.address2 %> /><br>
 <% }); %>
-</tr>
 <% }); %>
-</table>
+<div class='mydiv'>
+Hello
+</div> 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><input type="submit" value="EDIT"></b>
+</form>
+<script>
+setTimeout(function() {
+    $('#mydiv').fadeOut('fast');
+}, 1000);
+</script>
+</html>

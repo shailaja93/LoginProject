@@ -42,6 +42,16 @@ li a:hover:not(.active) {
   </ul>
 </ul>
 <p>
-    <p><h1> Welcome <%= req.session.username %></h1> </p>
+<h4 style="font-family:verdana;">Reset Your Password Here -</h4>
+<form method = "post" action='/UserloginController/afterlogin_resetpassword'>
+OLD PASSWORD :&nbsp;&nbsp; <input type="password" name="oldpass" placeholder ="Old Password" required="required"/>
+</br>
+NEW PASSWORD :&nbsp;&nbsp;<input type="password" name="newpass" placeholder= "New Password" required="required"/>
+</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><input type="submit" value = "CHANGE PASSWORD" /></b>
+</form>
 </body>
 </html>
+
+
+

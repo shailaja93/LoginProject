@@ -38,8 +38,14 @@ module.exports.routes = {
 
   'get /UserloginController/afterlogin_authenticate': 'UserloginController.afterlogin_authenticate',
   'post /UserloginController/register_user': 'UserloginController.register_user',
-  'get /views/register': { view: 'register' },
-  'get /UserloginController/afterlogin_viewprofile': 'UserloginController.afterlogin_viewprofile' 
+  'get /views/register_form': { view: 'register_form' },
+  'get /views/welcome': { view: 'welcome'},
+  'get /UserloginController/afterlogin_viewprofile': 'UserloginController.afterlogin_viewprofile',
+  'get /UserloginController/destroy_session': 'UserloginController.destroy_session',
+  'post /UserloginController/afterlogin_updation': 'UserloginController.afterlogin_updation',
+  'get /views/reset': { view: 'reset' },
+  'get /views/view_profile': { view: 'view_profile'},
+  'post /UserloginController/afterlogin_resetpassword': 'UserloginController.afterlogin_resetpassword'
   
 
   /***************************************************************************

@@ -27,7 +27,7 @@ module.exports = {
         
            data.Count_user2 = useradd; 
     
-           console.log(data);
+   //        console.log(data);
            res.view('view_profile',{'userinfo' : data});
         });
        });  
@@ -38,18 +38,29 @@ module.exports = {
 		    var param = req.allParams();           
         var pass = param.password;
         var uname = param.username;
-        console.log(pass);
-        console.log(uname);
+        // console.log(pass);
+        // console.log(uname);
         
+        //-------------------TO FLASH A MESSAGE ON SCREEN FOR NOT ENTERING USERNAME AND PASSWORD-----------------
+        // if(!req.param('username') || !req.param('password'))
+        // {
+        //   var UnamepassRequiredError = [{name:'UsernamePasswordRequired',message:'You must enter both Useraname and Password'}];
+        //   req.session.flash = {
+        //     err : UnamepassRequiredError
+        //   }
+        //   return res.redirect("index.html");
+        // }
+        //--------------------------------------------------------------------------------------------------------
 
+          
         Userinfo.find({username: uname}, {select: ['username','id','password']})
         .exec(function(err, user1) {
         if(err) {
            return res.send(err);
         }
-        console.log("----------After Authentication-------------");
-        console.log(user1);
-        console.log("-------------------------------------------");
+        // console.log("----------After Authentication-------------");
+        // console.log(user1);
+        // console.log("-------------------------------------------");
 
         var data = {
                   Count_user : user1
@@ -70,6 +81,7 @@ module.exports = {
           var uid = getValueByKey('id', data.Count_user);
           var p = getValueByKey('password', data.Count_user);
 
+          req.session.authenticated = true;
           req.session.userid = uid;
           req.session.username = uname;
           
@@ -77,12 +89,8 @@ module.exports = {
                 if(err || !valid)
                     return res.send('Invalid username and password combination!', 500)
                 else
-                  res.view('welcome',{'user' : data.Count_user});
+                  res.view('welcome');
           });
-          // console.log("----------After getting ID----------");
-          // console.log(req.session);
-          // console.log("------------------------------------");
-        //  res.view('welcome',{'user' : data.Count_user});
         }
         else
         {
@@ -109,7 +117,6 @@ module.exports = {
       // console.log(pass);
        //});
 
-       console.log(pass);
        Userinfo.find({username: uname}, {select: ['username']})      //find() to check if username exists or not
        .exec(function(err, user) {
        if(err) {
@@ -144,13 +151,13 @@ module.exports = {
                                     };
                          var len = data.user_data.length;
                     
-                         console.log(userid);
+                         // console.log(userid);
                          var l = data.user_data.length; 
-                         console.log(l);
+                         // console.log(l);
         
 //-----------------------------------------------------------------------
                           function getValueByKey(key, data) {
-                          console.log(l);
+                          // console.log(l);
                      
                           for (var i = 0; i < l; i++) {
                              if (data[i] && data[i].hasOwnProperty(key)) {
@@ -161,7 +168,7 @@ module.exports = {
                           return -1;
                           }
                           var uid = getValueByKey('id', data.user_data);
-                          console.log(uid);
+                          // console.log(uid);
 
 //-----------------------------------------------------------------------------
                 
@@ -169,14 +176,84 @@ module.exports = {
                           address1: add1,
                           address2: add2,
                           user_id: uid                      }).exec(function (err, u) {
-                          console.log("---------------------------");
+                          // console.log("---------------------------");
                           res.redirect('index.html');
                       });         
                       });
                       });
        }        
        });    
-});
+  });
+ },
+
+  destroy_session : function(req,res)
+  {
+    req.session.destroy();
+    console.log(req.session);
+    res.redirect('index.html');
+  },
+
+  afterlogin_updation : function(req,res)
+  {
+     var param = req.allParams();
+     var fnm = param.Fname;
+     var lnm = param.Lname;
+     var add1 = param.Add1;
+     var add2 = param.Add2;
+     var uid = req.session.userid;
+     
+     Userinfo.update({id : uid}, {fname:fnm,lname :lnm}).exec(function(err,data) { 
+     if (err) {
+           return res.send(err);
+     }
+     Useraddress.update({user_id : uid}, {address1:add1,address2 :add2}).exec(function(err,data) { 
+     if (err) {
+           return res.send(err);
+     }
+     req.session.status = "Updated";
+     return res.redirect('/UserloginController/afterlogin_viewprofile');
+     });
+   });
+  },
+
+  afterlogin_resetpassword : function(req,res)
+  {
+     var param = req.allParams();
+     var opass = param.oldpass;
+     var npass = param.newpass;
+     var uid = req.session.userid;
+     
+     Userinfo.find({id: uid}, {select: ['password']})
+        .exec(function(err, user1) {
+        if(err) {
+           return res.send(err);
+        }
+        // console.log("--------STORED PASSWORD-----------");
+        // console.log(user1[0].password);
+        // console.log("----------------------------------");
+        bcrypt.compare(opass, user1[0].password, function(err, valid) {
+                if(err || !valid)
+                    return res.send('Old password not correct!', 500)
+                else
+                   bcrypt.hash(npass, 10, function(err, hash) {
+                   if(err) return cb(err);
+                   npass = hash
+                   
+                  // console.log("--------STORING NEW PASSWORD-----------");
+                  // console.log(npass);
+                  // console.log("----------------------------------");
+
+                  Userinfo.update({id : uid}, {password :npass})
+                  .exec(function(err,data)
+                  {        
+                      if (err) {
+                         return res.send(err);
+                      }
+                      return res.send("Changed");
+                  });
+                });
+               });
+              });    
   }
 };
 
