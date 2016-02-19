@@ -26,9 +26,9 @@ module.exports = {
            }
         
            data.Count_user2 = useradd; 
-    
-   //        console.log(data);
+          // req.addFlash('success', 'Profile Updated');
            res.view('view_profile',{'userinfo' : data});
+           
         });
        });  
   },
@@ -87,15 +87,18 @@ module.exports = {
           
           bcrypt.compare(pass, p, function(err, valid) {
                 if(err || !valid)
-                    return res.send('Invalid username and password combination!', 500)
+                {
+                    req.addFlash('invalid', 'Username/Password Invalid');
+                    return res.redirect('/');
+                }
                 else
                   res.view('welcome');
           });
         }
-        else
-        {
-           return res.send("Please enter a valid email/password!");
-        }  
+        else {
+              req.addFlash('invalid', 'Username/Password Invalid');
+              return res.redirect('/');
+        }
         });   
   },     
 
@@ -129,7 +132,8 @@ module.exports = {
      
        if(len == 1)                                  // if the username exists -- > enter unique id
        {
-          res.send("Username already taken!");
+          req.addFlash('username_taken', 'Username already Taken');
+          return res.redirect('/views/register_form');
        }
        else
        {
@@ -177,7 +181,9 @@ module.exports = {
                           address2: add2,
                           user_id: uid                      }).exec(function (err, u) {
                           // console.log("---------------------------");
-                          res.redirect('index.html');
+                         
+                         req.addFlash('successfully_register', 'Successfully Registered');
+                         return res.redirect('/');
                       });         
                       });
                       });
@@ -190,7 +196,7 @@ module.exports = {
   {
     req.session.destroy();
     console.log(req.session);
-    res.redirect('index.html');
+    res.redirect('/');
   },
 
   afterlogin_updation : function(req,res)
@@ -210,7 +216,8 @@ module.exports = {
      if (err) {
            return res.send(err);
      }
-     req.session.status = "Updated";
+
+     req.addFlash('update', 'Profile Updated');
      return res.redirect('/UserloginController/afterlogin_viewprofile');
      });
    });
@@ -233,7 +240,10 @@ module.exports = {
         // console.log("----------------------------------");
         bcrypt.compare(opass, user1[0].password, function(err, valid) {
                 if(err || !valid)
-                    return res.send('Old password not correct!', 500)
+                {
+                    req.addFlash('Wrong_password', 'Old Password incorrect');
+                    return res.redirect('/views/reset');
+                }
                 else
                    bcrypt.hash(npass, 10, function(err, hash) {
                    if(err) return cb(err);
@@ -249,11 +259,37 @@ module.exports = {
                       if (err) {
                          return res.send(err);
                       }
-                      return res.send("Changed");
+
+                      req.addFlash('reset', 'Password Changed');
+                      return res.redirect('/UserloginController/afterlogin_viewprofile');
                   });
                 });
                });
               });    
-  }
+  },
+
+  list_users : function(req,res) {
+
+        Userinfo.find({select: ['username','password','fname','lname']})
+        .exec(function(err, user1) {
+        if(err) {
+           return res.send(err);
+        }
+        var data = {
+                  user_data : user1
+        };
+
+        Useraddress.find({select: ['address1','address2']}).exec(function(err,useradd){
+           if(err) {
+           return res.send(err);
+           }
+        
+           data.useradd_data = useradd; 
+          // req.addFlash('success', 'Profile Updated');
+           res.view('listofusers',{'data' : data});
+           
+        });
+       }); 
+  } 
 };
 
